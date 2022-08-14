@@ -26,7 +26,7 @@ export const createVerifyToken = async (user: User, expiresAt: Date): Promise<Ge
             },
         });
     } catch (err) {
-        throw new HttpException(500, "Hiba a verify token létrehozásakor");
+        throw new HttpException(500, "Error while creating verify token");
     }
 };
 
@@ -96,7 +96,7 @@ export const createAuthTokens = async (
 
         return { accessToken, refreshToken };
     } catch (err) {
-        throw new HttpException(500, "Hiba az auth token létrehozásakor");
+        throw new HttpException(500, "Error while creating auth tokens");
     }
 };
 
@@ -187,7 +187,7 @@ export const createResetToken = async (user: User, expiresAt: Date): Promise<Gen
             },
         });
     } catch (err) {
-        throw new HttpException(500, "Hiba a reset token létrehozásakor");
+        throw new HttpException(500, "Error while creating reset token");
     }
 };
 

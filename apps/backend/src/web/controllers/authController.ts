@@ -49,11 +49,11 @@ export class AuthController {
 
         if (await checkDuplicateEmail(email)) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "duplicate_email",
-                        message: "A megadott email már foglalt",
+                        message: "The email is already in use",
                         path: ["body", "email"],
                     },
                 ],
@@ -62,11 +62,11 @@ export class AuthController {
 
         if (await checkDuplicateUsername(username)) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "duplicate_username",
-                        message: "A megadott felhasználónév már foglalt",
+                        message: "The username is already in use",
                         path: ["body", "username"],
                     },
                 ],
@@ -84,7 +84,7 @@ export class AuthController {
         );
 
         return res.status(200).json({
-            message: "Sikeres regisztráció",
+            message: "Succeessful registration",
         });
     }
 
@@ -96,16 +96,16 @@ export class AuthController {
 
         if (!user) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_credentials",
-                        message: "A megadott email vagy jelszó nem megfelelő",
+                        message: "The email or the password is invalid",
                         path: ["body", "email"],
                     },
                     {
                         code: "invalid_credentials",
-                        message: "A megadott email vagy jelszó nem megfelelő",
+                        message: "The email or the password is invalid",
                         path: ["body", "password"],
                     },
                 ],
@@ -131,7 +131,7 @@ export class AuthController {
         });
 
         return res.status(200).json({
-            message: "Sikeres bejelentkezés",
+            message: "Successful login",
             accessToken: {
                 token: accessToken,
                 expiresAt: accessExpiresAt,
@@ -155,11 +155,11 @@ export class AuthController {
 
         if (!refreshToken) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "missing_refresh_token",
-                        message: "Nem található refresh token",
+                        message: "Couldn't find refresh token",
                         path: ["cookies", "refreshToken"],
                     },
                 ],
@@ -170,11 +170,11 @@ export class AuthController {
 
         if (!token) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_refresh_token",
-                        message: "Érvénytelen refresh token",
+                        message: "The refresh token is invlaid",
                         path: ["cookies", "refreshToken"],
                     },
                 ],
@@ -187,11 +187,11 @@ export class AuthController {
             await deleteRefreshToken(token);
 
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_refresh_token",
-                        message: "Érvénytelen refresh token",
+                        message: "The refresh token is invlaid",
                         path: ["cookies", "refreshToken"],
                     },
                 ],
@@ -215,7 +215,7 @@ export class AuthController {
         });
 
         return res.status(200).json({
-            message: "Token sikeresen frissítve",
+            message: "Token successfully refreshed",
             accessToken: {
                 token: newTokens.accessToken,
                 expiresAt: accessExpiresAt,
@@ -239,7 +239,7 @@ export class AuthController {
         res.clearCookie("refresh_token");
 
         return res.status(200).json({
-            message: "Sikeres kijelentkezés",
+            message: "Successful logout",
         });
     }
 
@@ -251,11 +251,11 @@ export class AuthController {
 
         if (req.user!.verifiedAt) {
             return res.status(400).json({
-                message: "Hiba",
+                message: "Error",
                 errors: [
                     {
                         code: "already_verified",
-                        message: "Az email már meg van erősítve",
+                        message: "The user is already verified",
                         path: [],
                     },
                 ],
@@ -264,11 +264,11 @@ export class AuthController {
 
         if (!token || token.usedAt || token.user.email !== req.user!.email) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_verify_token",
-                        message: "Érvénytelen verify token",
+                        message: "The verify token is invalid",
                         path: ["query", "token"],
                     },
                 ],
@@ -279,7 +279,7 @@ export class AuthController {
         await setVerifyTokenUsedAt(token, new Date());
 
         return res.status(200).json({
-            message: "Sikeres megerősítés",
+            message: "Successful verification",
         });
     }
 
@@ -289,11 +289,11 @@ export class AuthController {
     ): Promise<Response<any, Record<string, any>>> {
         if (req.user!.verifiedAt) {
             return res.status(400).json({
-                message: "Hiba",
+                message: "Error",
                 errors: [
                     {
                         code: "already_verified",
-                        message: "Az email már meg van erősítve",
+                        message: "The user is already verified",
                         path: [],
                     },
                 ],
@@ -309,7 +309,7 @@ export class AuthController {
         );
 
         return res.status(200).json({
-            message: "Email elküldve",
+            message: "Email sent",
         });
     }
 
@@ -325,11 +325,11 @@ export class AuthController {
 
         if (!isPasswordValid) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_password",
-                        message: "A jelszó nem megfelelő",
+                        message: "The password is invalid",
                         path: ["body", "currentPassword"],
                     },
                 ],
@@ -339,7 +339,7 @@ export class AuthController {
         await setUserPassword(req.user!, req.body.newPassword);
 
         return res.status(200).json({
-            message: "Jelszó sikeresen megváltoztatva",
+            message: "Password successfully changed",
         });
     }
 
@@ -351,11 +351,11 @@ export class AuthController {
 
         if (!user) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_email",
-                        message: "Nem létezik ilyen email című felhasználó",
+                        message: "No user with that email exists",
                         path: ["body", "email"],
                     },
                 ],
@@ -371,7 +371,7 @@ export class AuthController {
         );
 
         return res.status(200).json({
-            message: "Email elküldve",
+            message: "Email sent",
         });
     }
 
@@ -383,11 +383,11 @@ export class AuthController {
 
         if (!token || token.usedAt) {
             return res.status(400).json({
-                message: "Hibás bemenet",
+                message: "Invalid input",
                 errors: [
                     {
                         code: "invalid_reset_token",
-                        message: "Érvénytelen reset token",
+                        message: "The reset token is invalid",
                         path: ["query", "token"],
                     },
                 ],
@@ -403,7 +403,7 @@ export class AuthController {
         ]);
 
         return res.status(200).json({
-            message: "Jelszó sikeresen megváltoztatva",
+            message: "Password successfully reset",
         });
     }
 }

@@ -21,13 +21,13 @@ export class SendResetEmail extends BaseJob implements JobImpl {
         await transporter.sendMail({
             from: `${process.env.APP_NAME} <${process.env.MAIL_USER}>`,
             to: email,
-            subject: "Jelszó megváltoztatása",
+            subject: "Reset password",
             html: `
-                <h1>Jelszó megváltoztatása</h1>
-                <p>Kattints <a href="${
+                <h1>Reset password</h1>
+                <p>Click <a href="${
                     process.env.APP_BASE_URL + "/reset-password?token=" + token
-                }">ide</a> a jelszavad megváltoztatásához.</p>
-                <p>A link még ${AuthController.RESET_TOKEN_EXPIRES_IN_HOURS} óráig érvényes.</p>
+                }">here</a> to reset your password.</p>
+                <p>The link is valid for ${AuthController.RESET_TOKEN_EXPIRES_IN_HOURS} hour(s).</p>
             `,
         });
     }

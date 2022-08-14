@@ -4,20 +4,20 @@ export const registerSchema = z.object({
     body: z
         .object({
             email: z
-                .string({ required_error: "Az email mező kötelező" })
-                .email({ message: "A megadott email nem megfelelő" }),
+                .string({ required_error: "The email field is required" })
+                .email({ message: "The given email is invalid" }),
             username: z.string({
-                required_error: "A felhasználónév mező kötelező",
+                required_error: "The username field is required",
             }),
-            password: z.string({ required_error: "A jelszó mező kötelező" }).min(8, {
-                message: "A jelszónak minimum 8 karakterből kell állnia",
+            password: z.string({ required_error: "The password field is required" }).min(8, {
+                message: "The password must be at least 8 characters long",
             }),
             passwordConfirmation: z.string({
-                required_error: "A jelszó megerősítése mező kötelező",
+                required_error: "The password confirmation field is required",
             }),
         })
         .refine((data) => data.password === data.passwordConfirmation, {
-            message: "A megadott jelszavak nem egyeznek",
+            message: "The password confirmation does not match the password",
             path: ["passwordConfirmation"],
         }),
 });

@@ -13,7 +13,7 @@ export const validate = (schema: AnyZodObject) => async (
     });
 
     if (!result.success) {
-        return res.status(400).json({ message: "Hibás bemenet", errors: result.error.issues });
+        return res.status(400).json({ message: "Invalid input", errors: result.error.issues });
     }
 
     return next();

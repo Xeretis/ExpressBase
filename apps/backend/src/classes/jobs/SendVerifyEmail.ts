@@ -20,13 +20,13 @@ export class SendVerifyEmail extends BaseJob implements JobImpl {
         await transporter.sendMail({
             from: `${process.env.APP_NAME} <${process.env.MAIL_USER}>`,
             to: email,
-            subject: "Email cím megerősítése",
+            subject: "Verify email address",
             html: `
-                <h1>Email cím megerősítése</h1>
-                <p>Kattintson <a href="${
+                <h1>Verify email address</h1>
+                <p>Click <a href="${
                     process.env.APP_BASE_URL + "/verify?token=" + token
-                }">ide</a> az email címe megerősítéséhez.</p>
-                <p>Amennyiben nem tudja honnan származik ez az üzenet hagyja figyelmen kívül</p>
+                }">here</a> to verify your email address.</p>
+                <p>If you don't know where this is from just ignore it</p>
             `,
         });
     }

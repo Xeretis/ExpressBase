@@ -3,20 +3,20 @@ import { z } from "zod";
 export const passwordChangeSchema = z.object({
     body: z
         .object({
-            currentPassword: z.string({ required_error: "A jelenlegi jelszó mező kötelező" }),
-            newPassword: z.string({ required_error: "Az új jelszó mező kötelező" }).min(8, {
-                message: "A jelszónak minimum 8 karakterből kell állnia",
+            currentPassword: z.string({ required_error: "The current password field is required" }),
+            newPassword: z.string({ required_error: "The new password field is required" }).min(8, {
+                message: "The new password must be at least 8 characters long",
             }),
             newPasswordConfirmation: z.string({
-                required_error: "Az új jelszó megerősítése mező kötelező",
+                required_error: "The new password confirmation field is required",
             }),
         })
         .refine((data) => data.currentPassword !== data.newPassword, {
-            message: "A jelenlegi és az új jelszavak egyeznek",
+            message: "The new and current password must be different",
             path: ["newPassword"],
         })
         .refine((data) => data.newPassword === data.newPasswordConfirmation, {
-            message: "A megadott új jelszavak nem egyeznek",
+            message: "The new password confirmation does not match the new password",
             path: ["newPasswordConfirmation"],
         }),
 });
