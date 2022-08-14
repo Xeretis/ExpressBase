@@ -1,0 +1,76 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String         @id @default(cuid())
+    username      String         @unique
+    email         String         @unique
+    password      String
+    role          Role           @default(USER)
+    verifiedAt    DateTime?
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    refreshTokens RefreshToken[]
+    accessTokens  AccessToken[]
+    generalTokens GeneralToken[]
+
+    @@map("users")
+}
+
+model RefreshToken {
+    id            Int           @id @default(autoincrement())
+    token         String        @unique
+    expiresAt     DateTime
+    usedAt        DateTime?
+    user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId        String
+    childToken    RefreshToken? @relation("RefreshTokenFamily")
+    parentToken   RefreshToken? @relation("RefreshTokenFamily", fields: [parentTokenId], references: [id], onDelete: Cascade)
+    parentTokenId Int?          @unique
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+
+    @@map("refresh_tokens")
+}
+
+model AccessToken {
+    id        Int      @id @default(autoincrement())
+    token     String   @unique
+    expiresAt DateTime
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("access_tokens")
+}
+
+model GeneralToken {
+    id        Int                 @id @default(autoincrement())
+    token     String              @unique
+    context   GeneralTokenContext
+    expiresAt DateTime
+    usedAt    DateTime?
+    user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    createdAt DateTime            @default(now())
+    updatedAt DateTime            @updatedAt
+
+    @@map("general_tokens")
+}
+
+enum GeneralTokenContext {
+    VERIFY_EMAIL
+    RESET_PASSWORD
+}
+
+enum Role {
+    USER
+    ADMIN
+}
