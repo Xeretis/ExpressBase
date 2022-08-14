@@ -31,7 +31,7 @@ I primarily made this for my own use in an other project but I will be updating 
 - [x] Vite for asset bundling
 - [x] Basic configuration of vite for working with the backend conveniently
 - [ ] Mantine beacuse it's awesome
-- [ ] Frontend for the default features of the backend (currnetly only auth)
+- [ ] Frontend for the default features of the backend (currently only auth)
 - [ ] Redux for state management and RTK Query for working with the backend api
 - [ ] React Router for routing
 
