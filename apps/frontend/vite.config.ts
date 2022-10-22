@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
 
     return {
         plugins: [react()],
+        esbuild: {
+            logOverride: { "this-is-undefined-in-esm": "silent" },
+        },
         server: {
             proxy: {
                 "/api": {

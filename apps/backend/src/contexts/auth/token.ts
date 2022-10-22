@@ -100,6 +100,24 @@ export const createAuthTokens = async (
     }
 };
 
+export const createAccessToken = async (user: User, accessExpiresAt: Date) => {
+    const accessToken = crypto.randomBytes(64).toString("hex");
+
+    try {
+        await prisma.accessToken.create({
+            data: {
+                token: accessToken,
+                userId: user.id,
+                expiresAt: accessExpiresAt,
+            },
+        });
+
+        return accessToken;
+    } catch (err) {
+        throw new HttpException(500, "Error while creating auth token");
+    }
+};
+
 export const getRefreshTokenWithUser = async (
     refreshToken: string
 ): Promise<RefreshTokenWithUser | undefined> => {

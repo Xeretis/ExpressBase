@@ -1,5 +1,6 @@
 import { Routes } from "./classes/routes";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import { errorMiddleware } from "./web/middlewares/errorMiddleware";
 import express from "express";
 import helmet from "helmet";
@@ -26,6 +27,7 @@ export class Application {
     }
 
     private initializeMiddlewares(): void {
+        this.app.use(cors());
         this.app.use(loggerMiddleware);
         this.app.use(rateLimit(15 * 60 * 1000, 150));
         this.app.use(hpp());

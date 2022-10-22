@@ -19,21 +19,22 @@ I primarily made this for my own use in an other project but I will be updating 
 - [x] Rate limiting middleware using redis
 - [x] Support for multiple routes files
 - [x] Logging using winston and morgan
+- [x] Shared libraries between frontend and backend (validation, respose types, etc)
 - [ ] User management
 - [ ] Utils for working with file uploads and downloads
 - [ ] Permissions system for more complex authorization
 - [ ] Better configurability for integrating with the frontend
 - [ ] Websockets using socket.io
-- [ ] Shared libraries between frontend and backend (validation, respose types, etc)
+
 
 ### Frontend
 
 - [x] Vite for asset bundling
 - [x] Basic configuration of vite for working with the backend conveniently
-- [ ] Mantine beacuse it's awesome
-- [ ] Frontend for the default features of the backend (currently only auth)
-- [ ] Redux for state management and RTK Query for working with the backend api
-- [ ] React Router for routing
+- [x] Mantine beacuse it's awesome
+- [x] Frontend for the default features of the backend (currently only auth)
+- [x] Redux for state management and RTK Query for working with the backend api
+- [x] React Router for routing
 
 ### Other
 

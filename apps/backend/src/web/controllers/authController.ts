@@ -1,15 +1,15 @@
+import {
+    LoginBody,
+    PasswordChangeBody,
+    PasswordResetBody,
+    PasswordResetQuery,
+    RegisterBody,
+    VerifyQuery,
+} from "shared";
 import { Request, Response } from "express";
 import { TypedRequestBody, TypedRequestQuery, TypedRequestQueryBody } from "../../classes/requests";
 import {
-    checkDuplicateEmail,
-    checkDuplicateUsername,
-    getUserByEmail,
-    login,
-    register,
-    setUserPassword,
-    verifyUser,
-} from "../../contexts/auth/user";
-import {
+    createAccessToken,
     createAuthTokens,
     createResetToken,
     createVerifyToken,
@@ -24,6 +24,13 @@ import {
     setResetTokenUsedAt,
     setVerifyTokenUsedAt,
 } from "../../contexts/auth/token";
+import {
+    getUserByEmail,
+    login,
+    register,
+    setUserPassword,
+    verifyUser,
+} from "../../contexts/auth/user";
 
 import { SendResetEmail } from "../../classes/jobs/SendResetEmail";
 import { SendVerifyEmail } from "../../classes/jobs/SendVerifyEmail";
@@ -38,40 +45,10 @@ export class AuthController {
     static RESET_TOKEN_EXPIRES_IN_HOURS = 1;
 
     public static async register(
-        req: TypedRequestBody<{
-            username: string;
-            email: string;
-            password: string;
-        }>,
+        req: TypedRequestBody<RegisterBody>,
         res: Response
     ): Promise<Response<any, Record<string, any>>> {
         const { username, email, password } = req.body;
-
-        if (await checkDuplicateEmail(email)) {
-            return res.status(400).json({
-                message: "Invalid input",
-                errors: [
-                    {
-                        code: "duplicate_email",
-                        message: "The email is already in use",
-                        path: ["body", "email"],
-                    },
-                ],
-            });
-        }
-
-        if (await checkDuplicateUsername(username)) {
-            return res.status(400).json({
-                message: "Invalid input",
-                errors: [
-                    {
-                        code: "duplicate_username",
-                        message: "The username is already in use",
-                        path: ["body", "username"],
-                    },
-                ],
-            });
-        }
 
         const expiresAt = dayjs().add(AuthController.VERIFY_TOKEN_EXPIRES_IN_DAYS, "day").toDate();
 
@@ -89,7 +66,7 @@ export class AuthController {
     }
 
     public static async login(
-        req: TypedRequestBody<{ email: string; password: string }>,
+        req: TypedRequestBody<LoginBody>,
         res: Response
     ): Promise<Response<any, Record<string, any>>> {
         const user = await login(req.body.email, req.body.password);
@@ -112,23 +89,32 @@ export class AuthController {
             });
         }
 
-        const accessExpiresAt = dayjs()
-            .add(AuthController.ACCESS_TOKEN_EXPIRES_IN_MINUTES, "minute")
-            .toDate();
-        const refreshExpiresAt = dayjs()
-            .add(AuthController.RESFRESH_TOKEN_EXPIRES_IN_DAYS, "day")
-            .toDate();
+        let accessExpiresAt: Date;
+        let accessToken: string;
 
-        const { accessToken, refreshToken } = await createAuthTokens(
-            user,
-            accessExpiresAt,
-            refreshExpiresAt
-        );
+        if (req.body.remember) {
+            accessExpiresAt = dayjs()
+                .add(AuthController.ACCESS_TOKEN_EXPIRES_IN_MINUTES, "minute")
+                .toDate();
+            const refreshExpiresAt = dayjs()
+                .add(AuthController.RESFRESH_TOKEN_EXPIRES_IN_DAYS, "day")
+                .toDate();
 
-        res.cookie("refresh_token", refreshToken, {
-            httpOnly: true,
-            expires: accessExpiresAt,
-        });
+            const tokens = await createAuthTokens(user, accessExpiresAt, refreshExpiresAt);
+
+            accessToken = tokens.accessToken;
+
+            res.cookie("refresh_token", tokens.refreshToken, {
+                httpOnly: true,
+                expires: accessExpiresAt,
+            });
+        } else {
+            accessExpiresAt = dayjs()
+                .add(AuthController.ACCESS_TOKEN_EXPIRES_IN_MINUTES, "minute")
+                .toDate();
+
+            accessToken = await createAccessToken(user, accessExpiresAt);
+        }
 
         return res.status(200).json({
             message: "Successful login",
@@ -244,7 +230,7 @@ export class AuthController {
     }
 
     public static async verify(
-        req: TypedRequestQuery<{ token: string }>,
+        req: TypedRequestQuery<VerifyQuery>,
         res: Response
     ): Promise<Response<any, Record<string, any>>> {
         const token = await getVerifyTokenWithUser(req.query.token);
@@ -314,11 +300,7 @@ export class AuthController {
     }
 
     public static async passwordChange(
-        req: TypedRequestBody<{
-            currentPassword: string;
-            newPassword: string;
-            newPasswordConfirmation: string;
-        }>,
+        req: TypedRequestBody<PasswordChangeBody>,
         res: Response
     ): Promise<Response<any, Record<string, any>>> {
         const isPasswordValid = await bcrypt.compare(req.body.currentPassword, req.user!.password);
@@ -376,7 +358,7 @@ export class AuthController {
     }
 
     public static async passwordReset(
-        req: TypedRequestQueryBody<{ token: string }, { password: string }>,
+        req: TypedRequestQueryBody<PasswordResetQuery, PasswordResetBody>,
         res: Response
     ): Promise<Response<any, Record<string, any>>> {
         const token = await getResetTokenWithUser(req.query.token);
